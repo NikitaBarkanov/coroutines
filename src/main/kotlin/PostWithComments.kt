@@ -3,10 +3,10 @@ data class PostWithComments(
     val comments: List<Comment>,
 )
 
-data class PostAuthor(
+/*data class PostAuthor(
     val id: Long,
     val post: List<Author>
-)
+)*/
 
 data class PostWithCommentsAndAuthors(
     val post: Post,

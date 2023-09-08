@@ -27,7 +27,22 @@ fun main() {
                     .map { post ->
                         async {
                             PostWithComments(post, getComments(client, post.id))
-                            PostAuthor(post.authorId, getAuthors(client, post.authorId))
+                        }
+                    }.awaitAll()
+                println(posts)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    with(CoroutineScope(EmptyCoroutineContext)) {
+        launch {
+            try {
+                val posts = getPosts(client)
+                    .map { post ->
+                        async {
+                            PostWithCommentsAndAuthors(post, getComments(client, post.id), getAuthors(client, post.authorId))
                         }
                     }.awaitAll()
                 println(posts)
@@ -77,5 +92,5 @@ suspend fun getPosts(client: OkHttpClient): List<Post> =
 suspend fun getComments(client: OkHttpClient, id: Long): List<Comment> =
     makeRequest("$BASE_URL/api/slow/posts/$id/comments", client, object : TypeToken<List<Comment>>() {})
 
-suspend fun getAuthors(client: OkHttpClient, id: Long): List<Author> =
-    makeRequest("$BASE_URL/api/slow/author/${id}", client, object : TypeToken<List<Author>>() {})
+suspend fun getAuthors(client: OkHttpClient, id: Long): Author =
+    makeRequest("$BASE_URL/api/author/${id}", client, object : TypeToken<Author>() {})
